@@ -11,48 +11,66 @@ import SwiftUI
 struct ContentView: View {
     
     @State var alertIsVisible = false
-    @State var sliderValue: Double = 50.0
+    @State var sliderValue = 50.0
+    @State var target = Int.random(in: 1...100)
+    @State var score = 0
+    @State var round = 1
     
     var body: some View {
         VStack {
-            Spacer()
+            
             //Target Row
-            HStack {
-                Text("Target to Hit: ")
-                Text("100")
-            }
             Spacer()
+            HStack {
+                Text("Target ")
+                    .font(.largeTitle)
+                Text("\(target)")
+                    .font(.largeTitle)
+            }
+            
             //Slider Row
+            Spacer()
             HStack {
                 Text("1")
                 Slider(value: $sliderValue, in: 1...100)
                 Text("100")
-            }
+            }.padding()
             
             
-            
-            //Hit me Row
+            //Hit It Button
             Button(action: {
                 self.alertIsVisible = true
+                self.score += self.computeScore()
             }) {
-                Text(/*@START_MENU_TOKEN@*/"Hit Me!"/*@END_MENU_TOKEN@*/)
+                Text("Hit It!")
             }
             .alert(isPresented: $alertIsVisible){ () ->
                 Alert in
-                return Alert(title: Text("Hello"), message: Text("\(Int(self.sliderValue.rounded()))"), dismissButton: Alert.Button.default(Text("Okkkaaay")))
+                return Alert(title: Text("You scored \(computeScore())"), message: Text("The slider value was \(Int(sliderValue.rounded()))"), dismissButton: Alert.Button.default(Text("Next Round")) {
+                    self.target = Int.random(in: 1...100)
+                    self.round += 1
+                })
             }
-            Spacer()
+            
             //Third Row
+            Spacer()
             HStack {
-                Button(action: /*@START_MENU_TOKEN@*/{}/*@END_MENU_TOKEN@*/) {
+                Button(action: {
+                    self.startOver()
+                }) {
                     Text("Start Over")
                 }
                 Spacer()
-                Text("Score: ")
-                Text("99999")
+                Text("Score ")
+                    .font(.title)
+                    
+                Text("\(score)")
+                    .font(.title)
                 Spacer()
-                Text("Round: ")
-                Text("999")
+                Text("Round ")
+                    .font(.title)
+                Text("\(round)")
+                    .font(.title)
                 Spacer()
                 Button(action: /*@START_MENU_TOKEN@*/{}/*@END_MENU_TOKEN@*/) {
                     Text("Info")
@@ -61,6 +79,20 @@ struct ContentView: View {
             .padding()
         }
     }
+    
+    func computeScore() -> Int {
+        let computedScore = 100 - abs(target - Int(sliderValue.rounded()))
+        return computedScore
+    }
+    
+    func startOver() {
+        score = 0
+        round = 1
+        sliderValue = 50.0
+        target = Int.random(in: 1...100)
+        
+    }
+    
 }
 
 struct ContentView_Previews: PreviewProvider {
